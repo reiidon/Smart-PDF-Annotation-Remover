@@ -7,6 +7,7 @@ from app.services.pdf_reader import PDFReader
 from app.services.annotation_detector import AnnotationDetector
 from app.services.annotation_remover import AnnotationRemover
 from app.services.pdf_writer import PDFWriter
+from app.services.pdf_cleaner import PDFCleaner
 
 router = APIRouter(
     prefix="/pdf",
@@ -98,6 +99,35 @@ async def remove_annotations(filename: str):
         "output_file": output_path.name
     }
 
+# ==========================================================
+# Remove Signatures
+# ==========================================================
+
+@router.post("/remove-signatures/{filename}")
+async def remove_signatures(filename: str):
+
+    file_path = UPLOAD_FOLDER / filename
+
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="PDF not found."
+        )
+
+    output_path = OUTPUT_FOLDER / f"clean_{filename}"
+
+    cleaner = PDFCleaner()
+
+    cleaner.clean_pdf(
+        str(file_path),
+        str(output_path)
+    )
+
+    return {
+        "success": True,
+        "message": "Signatures removed successfully.",
+        "output_file": output_path.name
+    }
 
 # ==========================================================
 # Download Clean PDF

@@ -269,34 +269,67 @@ with st.container():
 
 with st.container():
 
-    st.subheader("🧹 Remove Annotations")
+    st.subheader("🧹 Remove PDF Content")
 
-    remove_btn = st.button(
-        "🧹 Remove Annotations",
-        use_container_width=True,
-        disabled=st.session_state.detect_result is None
-    )
+    col1, col2 = st.columns(2)
 
-    if remove_btn:
+    # --------------------------------------------
+    # Remove PDF Annotations
+    # --------------------------------------------
+    with col1:
 
-        with st.spinner("Removing annotations..."):
+        remove_annotation_btn = st.button(
+            "📝 Remove PDF Annotations",
+            use_container_width=True,
+            disabled=st.session_state.detect_result is None
+        )
 
-            try:
+        if remove_annotation_btn:
 
-                result = APIService.remove_annotations(
-                    st.session_state.filename
-                )
+            with st.spinner("Removing PDF annotations..."):
 
-                st.session_state.cleaned_filename = result["output_file"]
+                try:
 
-                st.toast(
-                    "🧹 Annotations removed successfully!",
-                    icon="🧹"
-                )
+                    result = APIService.remove_annotations(
+                        st.session_state.filename
+                    )
 
-            except Exception as e:
+                    st.session_state.cleaned_filename = result["output_file"]
 
-                st.error(f"Removal Failed: {e}")
+                    st.success("PDF annotations removed successfully!")
+
+                except Exception as e:
+
+                    st.error(f"Removal Failed: {e}")
+
+    # --------------------------------------------
+    # Remove Handwritten Signature
+    # --------------------------------------------
+    with col2:
+
+        remove_signature_btn = st.button(
+            "✍ Remove Handwritten Signature",
+            use_container_width=True,
+            disabled=st.session_state.filename is None
+        )
+
+        if remove_signature_btn:
+
+            with st.spinner("Removing handwritten signature..."):
+
+                try:
+
+                    result = APIService.remove_signatures(
+                        st.session_state.filename
+                    )
+
+                    st.session_state.cleaned_filename = result["output_file"]
+
+                    st.success("Handwritten signature removed successfully!")
+
+                except Exception as e:
+
+                    st.error(f"Removal Failed: {e}")
 
 # ======================================================
 # Download

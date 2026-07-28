@@ -47,6 +47,18 @@ class APIService:
 
         return response.json()
 
+    # NEW FUNCTION
+    @staticmethod
+    def remove_signatures(filename):
+
+        response = requests.post(
+            f"{BASE_URL}/pdf/remove-signatures/{filename}"
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
     @staticmethod
     def download_pdf(filename):
 

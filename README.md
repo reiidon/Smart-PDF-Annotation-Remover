@@ -12,17 +12,23 @@ The project provides a simple interface while maintaining the integrity of the o
 
 ---
 
-## ✨ Features
+## Current Features
 
-- 📂 Upload PDF documents
-- 🔍 Detect PDF annotations
-- 📝 Display annotation details
-- 🧹 Remove annotations safely
-- ⬇ Download cleaned PDF
-- 📊 User-friendly dashboard
-- 🔄 Start a new session without refreshing
+- Upload PDF
+- Detect PDF annotations
+- Remove PDF annotations
+- Convert scanned PDF pages to images
+- OpenCV-based handwritten signature detection
+- Rebuild cleaned PDF
 
----
+
+## Current Limitations
+
+The handwritten signature removal pipeline is implemented using OpenCV.
+Detection accuracy depends on scan quality, handwriting style, and pen color.
+Future work includes replacing the heuristic detector with a trained deep-learning model such as YOLO.
+
+
 
 ## 🛠 Technologies Used
 
