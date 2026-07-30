@@ -39,6 +39,51 @@ async def upload_pdf(file: UploadFile = File(...)):
         "filename": file.filename
     }
 
+# ==========================================================
+# Process PDF (Upload + Clean)
+# ==========================================================
+
+@router.post("/process")
+async def process_pdf(file: UploadFile = File(...)):
+
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF files are allowed."
+        )
+
+    # Save uploaded file
+    file_path = UPLOAD_FOLDER / file.filename
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # ---------- Remove PDF Annotations ----------
+    document = PDFReader.open_pdf(str(file_path))
+
+    AnnotationRemover.remove_annotations(document)
+
+    annotation_output = PDFWriter.save(document, file.filename)
+
+    document.close()
+
+    # ---------- Remove Image Signatures ----------
+    cleaner = PDFCleaner()
+
+    final_output = OUTPUT_FOLDER / f"clean_{file.filename}"
+
+    cleaner.clean_pdf(
+        str(annotation_output),
+        str(final_output)
+    )
+
+    return {
+        "success": True,
+        "message": "PDF processed successfully.",
+        "filename": file.filename,
+        "output_file": final_output.name
+    }
+
 
 # ==========================================================
 # Detect Annotations

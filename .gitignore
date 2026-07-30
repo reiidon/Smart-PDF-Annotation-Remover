@@ -1,57 +1,68 @@
-# ===========================
 # Python
-# ===========================
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
 
-# ===========================
-# Virtual Environments
-# ===========================
-venv/
+# Virtual Environment
 .venv/
+venv/
 env/
 
-# ===========================
-# VS Code
-# ===========================
+# IDE
 .vscode/
-
-# ===========================
-# PyCharm
-# ===========================
 .idea/
 
-# ===========================
-# Environment Variables
-# ===========================
+# Environment
 .env
 
-# ===========================
-# Python Cache
-# ===========================
+# Python cache
 .pytest_cache/
 .mypy_cache/
 
-# ===========================
-# Streamlit Cache
-# ===========================
-.streamlit/secrets.toml
+# Build
+build/
+dist/
 
-# ===========================
-# Uploaded PDFs
-# ===========================
-backend/uploads/*
-!backend/uploads/.gitkeep
-
-# ===========================
-# Generated PDFs
-# ===========================
-backend/outputs/*
-!backend/outputs/.gitkeep
-
-# ===========================
-# OS Files
-# ===========================
+# OS
 .DS_Store
 Thumbs.db
+
+# YOLO training outputs
+runs/
+outputs/
+
+# Images generated during testing
+prediction.jpg
+
+# Large datasets
+backend/app/ai/datasets/signatures/
+
+# Temporary files
+*.log
+
+# Runtime
+backend/backend/temp/
+backend/uploads/
+
+# YOLO pretrained models
+backend/yolo11n.pt
+backend/yolo26n.pt
+
+# Prediction images
+prediction.jpg
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+
+
+# Node
+node_modules/
+dist/
+
+# YOLO training outputs
+backend/app/ai/models/signature_detector*/
