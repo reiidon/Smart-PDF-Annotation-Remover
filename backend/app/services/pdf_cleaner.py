@@ -2,7 +2,7 @@ import cv2
 
 from app.cv.pdf_converter import PDFConverter
 from app.cv.image_processor import ImageProcessor
-from app.cv.signature_detector import SignatureDetector
+from app.ai.yolo_detector import SignatureDetector
 from app.cv.inpainter import Inpainter
 from app.cv.pdf_builder import PDFBuilder
 
@@ -19,7 +19,6 @@ class PDFCleaner:
 
     def clean_pdf(self, pdf_path, output_pdf):
 
-        # Convert PDF pages to images
         image_paths = self.converter.pdf_to_images(pdf_path)
 
         cleaned_images = []
@@ -28,35 +27,36 @@ class PDFCleaner:
 
             print(f"\nProcessing: {image_path}")
 
-            # Load image
             image = self.processor.load_image(image_path)
 
-            # Convert to grayscale
-            gray = self.processor.to_grayscale(image)
+            # Save original size
+            original_height, original_width = image.shape[:2]
 
-            # Remove noise
-            blur = self.processor.remove_noise(gray)
+            # Upscale image for better small-object detection
+            scale = 2.0
 
-            # Threshold image
-            binary = self.processor.threshold(blur)
+            image = cv2.resize(
+                image,
+                None,
+                fx=scale,
+                fy=scale,
+                interpolation=cv2.INTER_CUBIC
+            )
 
-            # Detect signature regions
-            regions = self.detector.detect_regions(binary)
+            boxes = self.detector.detect(image)
 
-            print(f"Detected {len(regions)} region(s)")
+            print(f"Detected {len(boxes)} signature(s)")
 
-            # -----------------------------
-            # DEBUG IMAGE
-            # -----------------------------
+            # Draw debug boxes
             debug = image.copy()
 
-            for (x, y, w, h) in regions:
+            for (x1, y1, x2, y2) in boxes:
                 cv2.rectangle(
                     debug,
-                    (x, y),
-                    (x + w, y + h),
+                    (x1, y1),
+                    (x2, y2),
                     (0, 255, 0),
-                    2
+                    3
                 )
 
             debug_path = image_path.replace(".png", "_detected.png")
@@ -64,12 +64,16 @@ class PDFCleaner:
 
             print(f"Debug image saved: {debug_path}")
 
-            # -----------------------------
-            # Remove detected regions
-            # -----------------------------
             cleaned = self.inpainter.remove_regions(
                 image,
-                regions
+                boxes
+            )
+
+            # Resize back to original size
+            cleaned = cv2.resize(
+                cleaned,
+                (original_width, original_height),
+                interpolation=cv2.INTER_AREA
             )
 
             cleaned_path = image_path.replace(".png", "_clean.png")
@@ -80,7 +84,6 @@ class PDFCleaner:
 
             cleaned_images.append(cleaned_path)
 
-        # Build final PDF
         self.builder.images_to_pdf(
             cleaned_images,
             output_pdf

@@ -4,19 +4,33 @@ import numpy as np
 
 class Inpainter:
 
-    def remove_regions(self, image, regions):
+    def remove_regions(self, image, boxes):
 
-        cleaned = image.copy()
+        # Create empty mask
+        mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
-        for x, y, w, h in regions:
+        for (x1, y1, x2, y2) in boxes:
 
-            padding = 8
+            padding = 12
 
-            x1 = max(0, x - padding)
-            y1 = max(0, y - padding)
-            x2 = min(image.shape[1], x + w + padding)
-            y2 = min(image.shape[0], y + h + padding)
+            x1 = max(0, x1 - padding)
+            y1 = max(0, y1 - padding)
+            x2 = min(image.shape[1], x2 + padding)
+            y2 = min(image.shape[0], y2 + padding)
 
-            cleaned[y1:y2, x1:x2] = (255, 255, 255)
+            cv2.rectangle(
+                mask,
+                (x1, y1),
+                (x2, y2),
+                255,
+                -1
+            )
+
+        cleaned = cv2.inpaint(
+            image,
+            mask,
+            7,
+            cv2.INPAINT_TELEA
+        )
 
         return cleaned
